@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body></body>
+</html>
+<html>
+  <head>
+    <style>
+      body {
+        background-color: #f7f7f9;
+        color: #1d2126;
+        font-family: sans-serif;
+      }
+      .budget-card {
+        background-color: #fff;
+        display: block;
+        padding: 40px;
+        width: 300px;
+        margin: 0 auto;
+        border-radius: 3px;
+        box-shadow: 0px 1px 4px 0px #e0e0e0;
+        margin-top: 15%;
+      }
+      #Msg {
+        color: green;
+        display: block;
+        padding: 2px;
+        margin-bottom: 10px;
+      }
+      h1 {
+        font-family: sans-serif;
+        font-size: 20px;
+        padding: 0;
+        margin-top: -20px;
+        margin-bottom: 32px;
+      }
+      form.budget-card input {
+        display: block;
+        border: 1px solid #e4e4e4;
+        padding: 8px;
+        font-size: 14px;
+        width: 280px;
+        border-radius: 4px;
+        margin: 8px 0;
+      }
+      button {
+        width: 300px;
+        border: none;
+        padding: 12px;
+        margin: 10px 0;
+        font-weight: bold;
+        background: #2196f3;
+        font-size: 14px;
+        color: #fafafa;
+        border-radius: 2px;
+      }
+      label {
+        display: block;
+        font-weight: 200;
+        margin-bottom: 12px;
+      }
+      input:focus {
+        outline: none;
+        border: 1px solid #2196f3 !important;
+      }
+    </style>
+  </head>
+  <body>
+    <form class="budget-card">
+      <h1>User Details</h1>
+      <div id="Msg"></div>
+      <div id="userDetails">
+        <label id="amtVal"></label>
+      </div>
+      <button id="refresh">Refresh</button>
+      <button id="logout">Logout</button>
+
+    </form>
+    <script>
+      // Event Listeners for Details Submitted
+      const userVal = JSON.parse(localStorage.getItem('user'));
+
+      const { id, name, wallet } = userVal.data.profile;
+
+      const userDetails = document.querySelector('#userDetails');
+      let amtVal = document.querySelector('#amtVal');
+
+      userDetails.innerHTML = `
+      <label>Username: ${name}</label>
+      <label>ID : ${id}</label>
+      `;
+      amtVal.innerHTML = `Amount : ${wallet.amount}`;
+      userDetails.appendChild(amtVal);
+
+      let refresh = document.querySelector('#refresh');
+      let logout = document.querySelector('#logout');
+      let Msg = document.querySelector('#Msg');
+
+
+      refresh.addEventListener('click', (e) => {
+        e.preventDefault();
+
+        const data = { id };
+
+        fetch('https://api.okra.ng/v2/mock-api/refresh-wallet', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            amtVal.innerHTML = `Amount : ${data.data.wallet.amount}`;
+          })
+          .catch((error) => {
+            console.error('Error:', error);
+          });
+      });
+
+    logout.addEventListener('click', (e) => {
+      e.preventDefault();
+
+        fetch('https://api.okra.ng/v2/mock-api/logout', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
+            if (data.status === 'success') {
+              Msg.textContent = data.message
+              setTimeout(() =>{
+                location.href = 'index.html'
+        }, 2000);
+      }
+          })
+          .catch((error) => {
+            console.error('Error:', error);
+          });
+      });
+  
+  </script>
+  </body>
+</html>
